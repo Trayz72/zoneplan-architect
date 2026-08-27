@@ -1,31 +1,37 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight, Download } from "lucide-react";
+import { ChevronDown, ChevronRight, Download, FileText } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { AppTopBar } from "@/components/AppTopBar";
-import { useStore, type Zone } from "@/lib/store";
+import { areaFor, COLUMNS, seatsFor, useStore, type Zone } from "@/lib/store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/projects/$id/export")({
   head: () => ({
     meta: [
-      { title: "Export sheet — Connplex Zoning Studio" },
-      { name: "description", content: "Review the zoning drawing sheet, title block and revision history before export." },
-      { property: "og:title", content: "Export sheet — Connplex Zoning Studio" },
-      { property: "og:description", content: "Review the zoning drawing sheet, title block and revision history before export." },
+      { title: "Export / review — Connplex Zoning Studio" },
+      { name: "description", content: "Review the generated cinema zoning drawing sheet and export to PDF or DWG." },
+      { property: "og:title", content: "Export / review — Connplex Zoning Studio" },
+      { property: "og:description", content: "Review the generated cinema zoning drawing sheet and export to PDF or DWG." },
     ],
   }),
   component: ExportPage,
 });
 
-const inputCls =
-  "h-8 w-full rounded-sm border border-input bg-background px-2 text-[13px] outline-none focus:border-ring";
+const SHEET_W = 640;
+const SHEET_H = 420;
+const SCALE = 0.6;
 
 const zoneFill: Record<Zone["kind"], string> = {
-  auditorium: "var(--zone-auditorium)",
-  foyer: "var(--zone-foyer)",
-  washroom: "var(--zone-washroom)",
-  generic: "var(--zone-generic)",
+  auditorium: "bg-zone-auditorium",
+  foyer: "bg-zone-foyer",
+  washroom: "bg-zone-washroom",
+  generic: "bg-zone-generic",
 };
+
+function formatDate() {
+  const d = new Date();
+  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 function ExportPage() {
   const { id } = Route.useParams();
@@ -35,101 +41,163 @@ function ExportPage() {
 
   if (!project) return <div className="p-6 text-[13px]">Project not found.</div>;
 
-  const today = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  const zones = project.zones;
+  const totalSeats = zones.filter((z) => z.kind === "auditorium").reduce((s, z) => s + seatsFor(z), 0);
+
+  const onExport = (type: "PDF" | "DWG") => {
+    toast(`${type} export simulated — this is a prototype`);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppTopBar title={`${project.name} · ${project.code} · ${project.revision}`} subtitle="Export / review" />
+    <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <AppTopBar title={`Export / review — ${project.name}`} subtitle={`${project.code} · ${project.revision}`} />
 
-      <main className="mx-auto max-w-[900px] p-4">
-        <div className="rounded-md border border-border bg-card p-4">
-          <svg viewBox="0 0 900 620" className="w-full bg-canvas">
-            <rect x="8" y="8" width="884" height="604" fill="none" stroke="currentColor" strokeWidth="2" className="text-foreground" />
-            <g transform="translate(40,30) scale(0.72)">
-              <rect x="0" y="0" width="760" height="530" fill="none" stroke="currentColor" strokeWidth="2" className="text-foreground" />
-              {project.zones.map((z) => (
-                <g key={z.id}>
-                  <rect x={z.x} y={z.y} width={z.w} height={z.h} fill={zoneFill[z.kind]} stroke="currentColor" strokeWidth="1" className="text-foreground/40" />
-                  <text x={z.x + z.w / 2} y={z.y + z.h / 2} textAnchor="middle" fontSize="16" fill="currentColor" className="text-foreground">
-                    {z.label}
-                  </text>
-                </g>
-              ))}
-            </g>
-            <g transform="translate(560,430)">
-              <rect x="0" y="0" width="324" height="174" fill="none" stroke="currentColor" strokeWidth="1" className="text-foreground" />
-              {[
-                ["Project code", project.code],
-                ["Property name", project.name],
-                ["City/State", project.city ? `${project.city}, ${project.state}` : "—"],
-                ["Client name", project.intake.clientName || "—"],
-                ["Net usage area", `${project.netArea.toLocaleString()} sq ft`],
-                ["Scale", "1:100 @ A1"],
-                ["Drawn by", project.drawnBy || "—"],
-                ["Checked by", project.checkedBy || "—"],
-                ["Date", today],
-              ].map(([k, v], i) => (
-                <g key={k} transform={`translate(8, ${16 + i * 16})`}>
-                  <text fontSize="10" fill="currentColor" className="text-muted-foreground">{k}</text>
-                  <text x="316" textAnchor="end" fontSize="10" fill="currentColor" className="text-foreground">{v}</text>
-                </g>
-              ))}
-              <text x="162" y="166" textAnchor="middle" fontSize="10" fill="currentColor" className="text-muted-foreground">
-                Connplex Cinemas Limited
-              </text>
-            </g>
-          </svg>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <label className="block">
-            <span className="mb-1 block text-[12px] text-muted-foreground">Drawn by</span>
-            <input className={inputCls} value={project.drawnBy} onChange={(e) => updateProject(id, { drawnBy: e.target.value })} />
-          </label>
-          <label className="block">
-            <span className="mb-1 block text-[12px] text-muted-foreground">Checked by</span>
-            <input className={inputCls} value={project.checkedBy} onChange={(e) => updateProject(id, { checkedBy: e.target.value })} />
-          </label>
-        </div>
-        <label className="mt-3 block">
-          <span className="mb-1 block text-[12px] text-muted-foreground">Remarks</span>
-          <textarea
-            rows={3}
-            className="w-full rounded-sm border border-input bg-background px-2 py-1.5 text-[13px] outline-none focus:border-ring"
-            value={project.remarks}
-            onChange={(e) => updateProject(id, { remarks: e.target.value })}
-          />
-        </label>
-
-        <div className="mt-3 flex gap-2">
-          {["Download PDF", "Download DWG"].map((label) => (
-            <button
-              key={label}
-              onClick={() => {
-                updateProject(id, { status: "Exported" });
-                toast("Export simulated — this is a prototype");
-              }}
-              className="inline-flex h-8 items-center gap-1.5 rounded-sm border border-border px-3 text-[13px] transition-colors hover:bg-accent"
+      <main className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="mx-auto max-w-4xl space-y-4">
+          {/* Drawing sheet preview */}
+          <div className="rounded-sm border border-border bg-card p-4">
+            <div
+              className="relative mx-auto border-2 border-foreground bg-white"
+              style={{ width: SHEET_W, height: SHEET_H }}
             >
-              <Download className="h-3.5 w-3.5" />
-              {label}
-            </button>
-          ))}
-        </div>
+              {/* Floor plan */}
+              <div
+                className="absolute left-4 top-4 border border-foreground/40 bg-canvas"
+                style={{ width: SHEET_W - 180, height: SHEET_H - 60 }}
+              >
+                {zones.map((z) => (
+                  <div
+                    key={z.id}
+                    className={`absolute border border-foreground/30 ${zoneFill[z.kind]}`}
+                    style={{ left: z.x * SCALE, top: z.y * SCALE, width: z.w * SCALE, height: z.h * SCALE }}
+                  >
+                    <span className="absolute inset-0 flex items-center justify-center text-[9px] font-medium text-foreground">
+                      {z.label}
+                    </span>
+                  </div>
+                ))}
+                {COLUMNS.map((c) => (
+                  <span
+                    key={c.id}
+                    className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground"
+                    style={{ left: c.x * SCALE, top: c.y * SCALE }}
+                  />
+                ))}
+              </div>
 
-        <div className="mt-4 rounded-md border border-border bg-card">
-          <button
-            onClick={() => setHistoryOpen((v) => !v)}
-            className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-[13px] text-foreground"
-          >
-            {historyOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-            Revision history
-          </button>
-          {historyOpen ? (
-            <div className="border-t border-border px-3 py-2 text-[12px] text-muted-foreground">
-              R0 · {today} · Initial draft
+              {/* Title block */}
+              <div className="absolute bottom-4 right-4 w-[160px] border border-foreground bg-card text-[10px]">
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Project code</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.code}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Property</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.name}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">City / state</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.city}, {project.state}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Client</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.intake.clientName || "—"}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Net usage area</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.netArea.toLocaleString()} sq ft</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Scale</div>
+                  <div className="p-1 text-right font-medium text-foreground">1:100</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Drawn by</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.drawnBy || "—"}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] border-b border-foreground/30">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Checked by</div>
+                  <div className="p-1 text-right font-medium text-foreground">{project.checkedBy || "—"}</div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto]">
+                  <div className="border-r border-foreground/30 p-1 text-muted-foreground">Date</div>
+                  <div className="p-1 text-right font-medium text-foreground">{formatDate()}</div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="absolute bottom-1 left-4 text-[9px] text-muted-foreground">Connplex Cinemas Limited</div>
             </div>
-          ) : null}
+          </div>
+
+          {/* Inputs */}
+          <div className="grid grid-cols-1 gap-3 rounded-sm border border-border bg-card p-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-[12px] text-muted-foreground">Drawn by</label>
+              <input
+                type="text"
+                value={project.drawnBy}
+                onChange={(e) => updateProject(id, { drawnBy: e.target.value })}
+                className="w-full rounded-sm border border-input bg-background px-2 py-1.5 text-[13px] outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-[12px] text-muted-foreground">Checked by</label>
+              <input
+                type="text"
+                value={project.checkedBy}
+                onChange={(e) => updateProject(id, { checkedBy: e.target.value })}
+                className="w-full rounded-sm border border-input bg-background px-2 py-1.5 text-[13px] outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-[12px] text-muted-foreground">Remarks</label>
+              <textarea
+                rows={3}
+                value={project.remarks}
+                onChange={(e) => updateProject(id, { remarks: e.target.value })}
+                className="w-full resize-none rounded-sm border border-input bg-background px-2 py-1.5 text-[13px] outline-none focus:ring-1 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => onExport("PDF")}
+              className="inline-flex h-9 items-center gap-1.5 rounded-sm bg-primary px-3 text-[13px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <FileText className="h-4 w-4" />
+              Download PDF
+            </button>
+            <button
+              onClick={() => onExport("DWG")}
+              className="inline-flex h-9 items-center gap-1.5 rounded-sm border border-border bg-card px-3 text-[13px] font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              <Download className="h-4 w-4" />
+              Download DWG
+            </button>
+          </div>
+
+          {/* Revision history */}
+          <div className="rounded-sm border border-border bg-card">
+            <button
+              onClick={() => setHistoryOpen((v) => !v)}
+              className="flex w-full items-center justify-between px-3 py-2 text-[13px] font-medium text-foreground hover:bg-accent"
+            >
+              <span>Revision history</span>
+              {historyOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </button>
+            {historyOpen ? (
+              <div className="border-t border-border px-3 py-2">
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="font-medium text-foreground">R0</span>
+                  <span className="text-muted-foreground">{formatDate()}</span>
+                </div>
+                <p className="text-[12px] text-muted-foreground">Initial draft</p>
+              </div>
+            ) : null}
+          </div>
         </div>
       </main>
     </div>
