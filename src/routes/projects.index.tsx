@@ -46,7 +46,7 @@ function ProjectsPage() {
         <div className="overflow-hidden rounded-md border border-border bg-card">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-border bg-muted/60 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+              <tr className="border-b border-border bg-muted/60 text-left text-[11px] tracking-wide text-muted-foreground">
                 <th className="px-3 py-2 font-medium">Project code</th>
                 <th className="px-3 py-2 font-medium">Property name</th>
                 <th className="px-3 py-2 font-medium">City/State</th>

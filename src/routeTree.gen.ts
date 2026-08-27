@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsIdCanvasRouteImport } from './routes/projects.$id.canvas'
+import { Route as ProjectsIdExportRouteImport } from './routes/projects.$id.export'
 import { Route as ProjectsIdFloorSetupRouteImport } from './routes/projects.$id.floor-setup'
 import { Route as ProjectsIdIntakeRouteImport } from './routes/projects.$id.intake'
 
@@ -36,6 +37,11 @@ const ProjectsIdCanvasRoute = ProjectsIdCanvasRouteImport.update({
   path: '/projects/$id/canvas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIdExportRoute = ProjectsIdExportRouteImport.update({
+  id: '/projects/$id/export',
+  path: '/projects/$id/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsIdFloorSetupRoute = ProjectsIdFloorSetupRouteImport.update({
   id: '/projects/$id/floor-setup',
   path: '/projects/$id/floor-setup',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/projects/': typeof ProjectsIndexRoute
   '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/export': typeof ProjectsIdExportRoute
   '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
   '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsIndexRoute
   '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/export': typeof ProjectsIdExportRoute
   '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
   '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/projects/': typeof ProjectsIndexRoute
   '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/export': typeof ProjectsIdExportRoute
   '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
   '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/projects/'
     | '/projects/$id/canvas'
+    | '/projects/$id/export'
     | '/projects/$id/floor-setup'
     | '/projects/$id/intake'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/projects'
     | '/projects/$id/canvas'
+    | '/projects/$id/export'
     | '/projects/$id/floor-setup'
     | '/projects/$id/intake'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/projects/'
     | '/projects/$id/canvas'
+    | '/projects/$id/export'
     | '/projects/$id/floor-setup'
     | '/projects/$id/intake'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   ProjectsIdCanvasRoute: typeof ProjectsIdCanvasRoute
+  ProjectsIdExportRoute: typeof ProjectsIdExportRoute
   ProjectsIdFloorSetupRoute: typeof ProjectsIdFloorSetupRoute
   ProjectsIdIntakeRoute: typeof ProjectsIdIntakeRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIdCanvasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/$id/export': {
+      id: '/projects/$id/export'
+      path: '/projects/$id/export'
+      fullPath: '/projects/$id/export'
+      preLoaderRoute: typeof ProjectsIdExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/$id/floor-setup': {
       id: '/projects/$id/floor-setup'
       path: '/projects/$id/floor-setup'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   ProjectsIdCanvasRoute: ProjectsIdCanvasRoute,
+  ProjectsIdExportRoute: ProjectsIdExportRoute,
   ProjectsIdFloorSetupRoute: ProjectsIdFloorSetupRoute,
   ProjectsIdIntakeRoute: ProjectsIdIntakeRoute,
 }

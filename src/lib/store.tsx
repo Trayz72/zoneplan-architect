@@ -83,11 +83,11 @@ export const defaultZones = (): Zone[] => [
 ];
 
 export const COLUMNS = [
-  { id: "c1", x: 60, y: 50 },
-  { id: "c2", x: 700, y: 50 },
-  { id: "c3", x: 380, y: 290 },
-  { id: "c4", x: 60, y: 480 },
-  { id: "c5", x: 700, y: 480 },
+  { id: "c1", x: 28, y: 24 },
+  { id: "c2", x: 732, y: 24 },
+  { id: "c3", x: 380, y: 291 },
+  { id: "c4", x: 28, y: 505 },
+  { id: "c5", x: 732, y: 505 },
 ];
 
 const seed = (
