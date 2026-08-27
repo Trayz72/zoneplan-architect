@@ -166,7 +166,7 @@ function CanvasPage() {
           </button>
           {leftOpen ? (
             <div className="min-h-0 flex-1 overflow-y-auto p-2">
-              <p className="px-1 py-1 text-[11px] uppercase tracking-wide text-muted-foreground">Zones</p>
+              <p className="px-1 py-1 text-[11px] tracking-wide text-muted-foreground">Zones</p>
               {zoneItems.map(({ label, Icon }) => (
                 <div
                   key={label}
@@ -177,7 +177,7 @@ function CanvasPage() {
                   {label}
                 </div>
               ))}
-              <p className="mt-3 px-1 py-1 text-[11px] uppercase tracking-wide text-muted-foreground">Seats</p>
+              <p className="mt-3 px-1 py-1 text-[11px] tracking-wide text-muted-foreground">Seats</p>
               {seatItems.map((label) => (
                 <div
                   key={label}
