@@ -10,33 +10,102 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsIdCanvasRouteImport } from './routes/projects.$id.canvas'
+import { Route as ProjectsIdFloorSetupRouteImport } from './routes/projects.$id.floor-setup'
+import { Route as ProjectsIdIntakeRouteImport } from './routes/projects.$id.intake'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIdCanvasRoute = ProjectsIdCanvasRouteImport.update({
+  id: '/projects/$id/canvas',
+  path: '/projects/$id/canvas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIdFloorSetupRoute = ProjectsIdFloorSetupRouteImport.update({
+  id: '/projects/$id/floor-setup',
+  path: '/projects/$id/floor-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIdIntakeRoute = ProjectsIdIntakeRouteImport.update({
+  id: '/projects/$id/intake',
+  path: '/projects/$id/intake',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/projects': typeof ProjectsIndexRoute
+  '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/projects/': typeof ProjectsIndexRoute
+  '/projects/$id/canvas': typeof ProjectsIdCanvasRoute
+  '/projects/$id/floor-setup': typeof ProjectsIdFloorSetupRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/projects/'
+    | '/projects/$id/canvas'
+    | '/projects/$id/floor-setup'
+    | '/projects/$id/intake'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/projects'
+    | '/projects/$id/canvas'
+    | '/projects/$id/floor-setup'
+    | '/projects/$id/intake'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/projects/'
+    | '/projects/$id/canvas'
+    | '/projects/$id/floor-setup'
+    | '/projects/$id/intake'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ProjectsIdCanvasRoute: typeof ProjectsIdCanvasRoute
+  ProjectsIdFloorSetupRoute: typeof ProjectsIdFloorSetupRoute
+  ProjectsIdIntakeRoute: typeof ProjectsIdIntakeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +117,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$id/canvas': {
+      id: '/projects/$id/canvas'
+      path: '/projects/$id/canvas'
+      fullPath: '/projects/$id/canvas'
+      preLoaderRoute: typeof ProjectsIdCanvasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$id/floor-setup': {
+      id: '/projects/$id/floor-setup'
+      path: '/projects/$id/floor-setup'
+      fullPath: '/projects/$id/floor-setup'
+      preLoaderRoute: typeof ProjectsIdFloorSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$id/intake': {
+      id: '/projects/$id/intake'
+      path: '/projects/$id/intake'
+      fullPath: '/projects/$id/intake'
+      preLoaderRoute: typeof ProjectsIdIntakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
+  ProjectsIdCanvasRoute: ProjectsIdCanvasRoute,
+  ProjectsIdFloorSetupRoute: ProjectsIdFloorSetupRoute,
+  ProjectsIdIntakeRoute: ProjectsIdIntakeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
