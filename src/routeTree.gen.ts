@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsIdIntakeRouteImport } from './routes/projects.$id.intake'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIdIntakeRoute = ProjectsIdIntakeRouteImport.update({
+  id: '/projects/$id/intake',
+  path: '/projects/$id/intake',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/projects': typeof ProjectsIndexRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/projects/$id/intake': typeof ProjectsIdIntakeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/projects/'
+  fullPaths: '/' | '/login' | '/projects/' | '/projects/$id/intake'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/projects'
-  id: '__root__' | '/' | '/login' | '/projects/'
+  to: '/' | '/login' | '/projects' | '/projects/$id/intake'
+  id: '__root__' | '/' | '/login' | '/projects/' | '/projects/$id/intake'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ProjectsIdIntakeRoute: typeof ProjectsIdIntakeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/$id/intake': {
+      id: '/projects/$id/intake'
+      path: '/projects/$id/intake'
+      fullPath: '/projects/$id/intake'
+      preLoaderRoute: typeof ProjectsIdIntakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
+  ProjectsIdIntakeRoute: ProjectsIdIntakeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
